@@ -1,0 +1,44 @@
+class Auditron:
+    """Main addon that intercepts, logs, and optionally modifies traffic."""
+
+    def __init__(self):
+        self.request_count = 0
+        self.storage_dir = STORAGE_DIR
+        self.encoder = EncoderDecoder()
+
+    def load(self, loader):
+        loader.add_option("auditron_storage", str, str(self.storage_dir),
+                          "Directory to store .txt files")
+        loader.add_option("auditron_ai", bool, AI_ENABLED,
+                          "Enable AI analysis (requires API key)")
+
+    def configure(self, updates):
+        if "auditron_storage" in updates:
+            # Use ctx.master.options to get the current value
+            new_path = ctx.master.options.auditron_storage
+            self.storage_dir = Path(new_path)
+            self.storage_dir.mkdir(parents=True, exist_ok=True)
+
+    def request(self, flow: http.HTTPFlow):
+        self.request_count += 1
+        ctx.log.info(f"[{self.request_count}] {flow.request.method} {flow.request.url}")
+
+    def response(self, flow: http.HTTPFlow):
+        # ... rest of the method unchanged ...
+        pass
+
+    def websocket_message(self, flow: http.HTTPFlow, message: websocket.WebSocketMessage):
+        # ... unchanged ...
+        pass
+
+    def extract_tokens(self, req_headers, req_body, resp_headers, resp_body) -> List[str]:
+        # ... unchanged ...
+        pass
+
+    def extract_ids(self, url: str, query: Dict) -> List[str]:
+        # ... unchanged ...
+        pass
+
+    def format_event(self, **kwargs) -> str:
+        # ... unchanged ...
+        pass
